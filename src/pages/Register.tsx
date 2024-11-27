@@ -119,7 +119,6 @@ export const Register = ()=> {
             setError(await sendMailResponse.text())
 
             if(error === '' || error === null) setValidatedFormData(true)
-
         }catch(e){
             console.log(e);
         }
@@ -131,7 +130,6 @@ export const Register = ()=> {
 
         if(error) return;
 
-        console.log(formData);
         try{
             const createUserResponse = await fetch('http://localhost:8080/createUser', {
                 method: 'POST',
@@ -142,9 +140,11 @@ export const Register = ()=> {
                 body: JSON.stringify(formData)
             })
 
-            if(createUserResponse.ok) window.location.href = '/login';
+            const text = await createUserResponse.text();
 
-            setError(await createUserResponse.json())
+            if (text === "") window.location.href = '/login';
+
+            setError(text)
         }catch(e){
             console.log(e);
         }
@@ -193,7 +193,7 @@ export const Register = ()=> {
                         className="relative rounded-2xl p-6 bg-[#1C1919] bg-opacity-80  lg:w-[1137px] h-auto flex justify-center items-center flex-col">
                         <img
                             className="absolute -top-8 -right-8 md:-right-20 lg:top-0 lg:-right-16 w-[90px] h-[90px] md:w-[150px] md:h-[150px]"
-                            src="/public/kirbyRegistro.png" alt={'Registro'}/>
+                            src="/kirbyRegistro.png" alt={'Registro'}/>
                         <h2 className="mb-2 lg:mb-6 tracking-[0.12em] text-white font-semibold text-[15px] md:text-[20px] uppercase">Crear
                             cuenta</h2>
                         <form onSubmit={sendMail}

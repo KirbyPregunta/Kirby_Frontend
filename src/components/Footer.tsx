@@ -8,9 +8,9 @@ export const Footer = () => {
                 aportar creando una pregunta? <span className="text-[#5990D2]">Crea tu pregunta acá</span></a>
             <div className="flex items-center justify-center">
                 <a href="#"><img className="max-w-[100%] w-[35px] md:w-[38px] h-[30px] md:h-[38px] "
-                                 src={"/public/instagram2.png"} alt="ig"/></a>
+                                 src={"/instagram2.png"} alt="ig"/></a>
                 <a href="#"><img className="max-w-[100%] w-[45px] md:w-[50px] h-[45px] md:h-[50px]"
-                                 src={"/public/twitch.png"} alt="twitch"/></a>
+                                 src={"/twitch.png"} alt="twitch"/></a>
             </div>
         </footer>
     )
