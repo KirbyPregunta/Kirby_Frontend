@@ -1,41 +1,145 @@
 import {Header} from "../components/Header";
 import {Footer} from "../components/Footer";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
+import Select from 'react-select';
 
 type Gender = {
     id: number;
     description: string;
 }
 
-type User = {
+type Country = {
     id: number;
+    description: string;
+}
+
+type User = {
     name: string;
     username: string;
     password: string;
     repeatPassword: string;
-    birthday: string;
+    birthdate: string;
     email: string;
-    profilePhoto: string;
-    country: number;
-    city: number;
-    gender: number;
+    country: number | null;
+    gender: number | null;
 }
 
 export const Register = ()=> {
-    const [formData, setFormData] = useState<User | null>(null);
+    const [formData, setFormData] = useState<User | null>({
+        name: '',
+        username: '',
+        password: '',
+        repeatPassword: '',
+        birthdate: '',
+        email: '',
+        country: null,
+        gender: null,
+    });
     const [genders, setGenders] = useState<Gender[]>([]);
+    const [countries, setCountries] = useState<Country[]>([]);
+    const [flagFetches, setFlagFetches] = useState<boolean>(false);
+    const [error, setError] = useState<string>('');
+
+    const countryOptions = countries.map((country: Country) => ({
+        label: country.description,
+        value: country.id,
+    }))
+    const genderOptions = genders.map((gender: Gender) => ({
+        label: gender.description,
+        value: gender.id,
+    }))
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData({...formData, [e.target.name]: e.target.value});
     }
 
+    const handleSelectChange = (selectedOption, fieldName) => {
+        setFormData({ ...formData, [fieldName]: selectedOption.value });
+    };
+
+    const validateInputs = () => {
+        if (formData.name === '') {
+            return '¡Debe ingresar su nombre!';
+        }
+
+        if (formData.username === '') {
+            return '¡Debe ingresar su username!';
+        }
+
+        if (formData.birthdate === '') {
+            return '¡Debe ingresar su fecha de nacimiento!';
+        }
+
+        if (formData.email === '') {
+            return '¡Debe ingresar su email!';
+        }
+
+        if (formData.password === '') {
+            return '¡Debe ingresar una contraseña!';
+        }
+
+        if (formData.repeatPassword === '') {
+            return '¡Debe repetir su contraseña!';
+        }
+
+        if (formData.repeatPassword !== formData.password) {
+            return '¡Las contraseñas deben ser iguales!';
+        }
+
+        if (formData.gender === null) {
+            return '¡Debe ingresar su género!';
+        }
+
+        if (formData.country === null) {
+            return '¡Debe ingresar su país!';
+        }
+
+        return null;
+    };
+
+    const createUser =  async (e : React.FormEvent)=>{
+        e.preventDefault();
+        setError(validateInputs);
+
+        if(error) return;
+
+        console.log(formData);
+        try{
+            const createUserResponse = await fetch('http://localhost:8080/createUser', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+
+            if(createUserResponse.ok) window.location.href = '/validateEmail';
+
+            setError(await createUserResponse.json())
+        }catch(e){
+            console.log(e);
+        }
+    }
+
+
     const fetchGenders = async () => {
         try {
-            const gendersResponse = await fetch("http://localhost:8080/genders",{
+            const gendersResponse = await fetch("http://localhost:8080/genders", {
                 method: "GET",
             });
             return await gendersResponse.json();
-        } catch (error){
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const fetchCountries = async () => {
+        try {
+            const countriesResponse = await fetch("http://localhost:8080/countries", {
+                method: "GET",
+            });
+            return await countriesResponse.json();
+        } catch (error) {
             console.log(error)
         }
     }
@@ -44,7 +148,13 @@ export const Register = ()=> {
         fetchGenders().then(r =>
             setGenders(r as Gender[])
         );
-    }, [formData]);
+
+        fetchCountries().then(r =>
+            setCountries(r as Country[])
+        )
+        setFlagFetches(true)
+
+    }, [flagFetches]);
 
     return (
         <>
@@ -57,76 +167,124 @@ export const Register = ()=> {
                         src="/public/kirbyRegistro.png" alt={'Registro'}/>
                     <h2 className="mb-2 lg:mb-6 tracking-[0.12em] text-white font-semibold text-[15px] md:text-[20px] uppercase">Crear
                         cuenta</h2>
-                    <form className="text-white font-light h-full tracking-[0.06em] text-[15px] "
-                          action="/register" method="POST" encType="multipart/form-data">
-                        <div className="flex flex-col md:flex-row gap-x-6 justify-center">
-                            <div className="flex flex-col gap-y-6">
-                                <input
-                                    className="w-[280px] h-[32.88px] lg:w-[430px] lg:h-[47px] rounded-xl p-2 outline-0 bg-[#252121] bg-opacity-80"
-                                    type="text" name="nombre" id="nombre"
-                                    placeholder="Nombre" required/>
+                    <form onSubmit={createUser} className="text-white font-light h-full tracking-[0.06em] text-[15px] flex flex-col gap-y-10">
+                        <div className="grid grid-cols-2 gap-y-10 gap-x-6">
+                            <input
+                                className="w-[280px] h-[32.88px] lg:w-[430px] lg:h-[47px] rounded-xl p-2 outline-0 bg-[#252121] bg-opacity-80"
+                                type="text" name="name" onChange={handleChange}
+                                placeholder="Nombre"/>
 
-                                <input
-                                    className="w-[280px] h-[32.88px] lg:w-[430px] lg:h-[47px] rounded-xl p-2 outline-0 bg-[#252121] bg-opacity-80"
-                                    type="date" name="fecha_nacimiento"
-                                    id="fecha_nacimiento" placeholder="Fecha de nacimiento" required/>
+                            <input
+                                className="w-[280px] h-[32.88px] lg:w-[430px] lg:h-[47px] rounded-xl p-2 outline-0 bg-[#252121] bg-opacity-80"
+                                type="text" name="username" onChange={handleChange}
+                                placeholder="Nombre de usuario"/>
+
+                            <input
+                                className="w-[280px] h-[32.88px] lg:w-[430px] lg:h-[47px] rounded-xl p-2 outline-0 bg-[#252121] bg-opacity-80"
+                                type="date" name="birthdate" onChange={handleChange}
+                                placeholder="Fecha de nacimiento"/>
+
+                            <input
+                                className="w-[280px] h-[32.88px] lg:w-[430px] lg:h-[47px] rounded-xl p-2 outline-0 bg-[#252121] bg-opacity-80"
+                                type="email" name="email" onChange={handleChange}
+                                placeholder="Email"/>
 
 
-                                <select
-                                    className="w-[280px] h-[32.88px] lg:w-[430px] lg:h-[47px] rounded-xl p-2 outline-0 bg-[#252121] bg-opacity-80 bg-"
-                                    onChange={handleChange} name={'gender'}>
-                                    {genders.map((gender, index) => (
-                                        <option key={index} value={gender.id}>
-                                            {gender.description}
-                                        </option>
-                                    ))}
-                                </select>
+                            <input
+                                className="w-[280px] h-[32.88px] lg:w-[430px] lg:h-[47px] rounded-xl p-2 outline-0 bg-[#252121] bg-opacity-80"
+                                type="password" name="password" onChange={handleChange}
+                                placeholder="Password"/>
 
-                                <input
-                                    className="w-[280px] h-[32.88px] lg:w-[430px] lg:h-[47px] rounded-xl p-2 outline-0 bg-[#252121] bg-opacity-80"
-                                    placeholder="Pais" type="text" name="pais" id="pais" required/>
+                            <input
+                                className="w-[280px] h-[32.88px] lg:w-[430px] lg:h-[47px] rounded-xl p-2 outline-0 bg-[#252121] bg-opacity-80"
+                                type="password" name="repeatPassword" onChange={handleChange}
+                                placeholder="Repetir Password"/>
 
-                                <div className="flex flex-col gap-y-2">
-                                    <input
-                                        className="w-[280px] h-[32.88px] lg:w-[430px] lg:h-[47px] rounded-xl p-2 outline-0 bg-[#252121] bg-opacity-80"
-                                        placeholder="Ciudad" type="text" name="ciudad" id="ciudad" required readOnly/>
-                                    <div className="w-[280px] h-[150px] md:h-[200px] md:w-[430px]" id="map"></div>
-                                </div>
-                            </div>
+                            <Select
+                                options={genderOptions}
+                                placeholder={'Seleccionar género'}
+                                onChange={(selectedOption) => handleSelectChange(selectedOption, 'gender')}
+                                name="gender"
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        backgroundColor: 'rgba(37, 33, 33, 0.8)',
+                                        borderColor: '#4B5563',
+                                        borderRadius: '8px',
+                                        color: 'white',
+                                        padding: '5px',
+                                    }),
+                                    menu: (provided) => ({
+                                        ...provided,
+                                        color: 'white',
+                                        backgroundColor: 'rgba(37, 33, 33, 0.9)',
+                                        borderRadius: '8px',
+                                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                                    }),
+                                    option: (provided, state) => ({
+                                        ...provided,
+                                        backgroundColor: state.isSelected
+                                            ? 'rgba(37, 33, 33, 1)'
+                                            : 'rgba(37, 33, 33, 0.8)',
+                                        color: 'white',
+                                        padding: '10px',
+                                        cursor: 'pointer',
+                                    }),
+                                }}
+                            />
 
-                            <div className="flex flex-col gap-y-6">
-                                <input
-                                    className="w-[280px] h-[32.88px] lg:w-[430px] lg:h-[47px] rounded-xl p-2 outline-0 bg-[#252121] bg-opacity-80"
-                                    type="text" name="register_username" id="username"
-                                    placeholder="Nombre de usuario" required/>
+                            <Select
+                                options={countryOptions}
+                                placeholder="Seleccionar país"
+                                onChange={(selectedOption) => handleSelectChange(selectedOption, 'country')}
+                                name="country"
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        backgroundColor: 'rgba(37, 33, 33, 0.8)',
+                                        borderColor: '#4B5563',
+                                        borderRadius: '8px',
+                                        padding: '5px',
+                                    }),
+                                    menu: (provided) => ({
+                                        ...provided,
+                                        color: 'white',
+                                        backgroundColor: 'rgba(37, 33, 33, 0.9)',
+                                        borderRadius: '8px',
+                                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                                        maxHeight: '200px',
+                                        overflow: 'hidden',
+                                        scrollbarWidth: 'none',
+                                    }),
+                                    menuList: (provided) => ({
+                                        ...provided,
+                                        maxHeight: '200px',
+                                        overflowY: 'auto',
+                                        scrollbarWidth: 'none',
+                                        msOverflowStyle: 'none',
+                                    }),
+                                    option: (provided, state) => ({
+                                        ...provided,
+                                        backgroundColor: state.isSelected
+                                            ? 'rgba(37, 33, 33, 1)'
+                                            : 'rgba(37, 33, 33, 0.8)',
+                                        color: 'white',
+                                        padding: '10px',
+                                        cursor: 'pointer',
+                                    }),
+                                }}
+                            />
 
-                                <input
-                                    className="w-[280px] h-[32.88px] lg:w-[430px] lg:h-[47px] rounded-xl p-2 outline-0 bg-[#252121] bg-opacity-80"
-                                    type="password" name="register_password" id="password"
-                                    placeholder="Password" required/>
-
-                                <input
-                                    className="w-[280px] h-[32.88px] lg:w-[430px] lg:h-[47px] rounded-xl p-2 outline-0 bg-[#252121] bg-opacity-80"
-                                    type="password" name="repetir_password"
-                                    id="repetir_password" placeholder="Repetir Password" required/>
-
-                                <input
-                                    className="w-[280px] h-[32.88px] lg:w-[430px] lg:h-[47px] rounded-xl p-2 outline-0 bg-[#252121] bg-opacity-80"
-                                    type="email" name="email" id="email"
-                                    placeholder="Email" required/>
-
-                                <input
-                                    className="w-[280px] h-[45px] lg:w-[430px] lg:h-[47px] rounded-xl p-2 outline-0 bg-[#252121] bg-opacity-80"
-                                    type="file" name="img_profile"
-                                    id="img_profile"/>
-                            </div>
 
                         </div>
-                        <div className="my-2 lg:my-6 flex justify-center items-center">
+                        <div className="my-2 lg:my-6 flex flex-col items-center">
                             <button
                                 className=" w-[159px] h-[40px] rounded-2xl bg-[#252121] bg-opacity-80 font-normal text-[12px] lg:text-[16px] uppercase"
                                 type="submit" name="registrarme">Registrarse
                             </button>
+                            {error && (
+                                <p className={'text-xl text-white'}>{error}</p>
+                            )}
                         </div>
 
                     </form>
