@@ -4,6 +4,7 @@ import { Login } from './pages/Login';
 import './index.css';
 import {Register} from "./pages/Register";
 import {Home} from "./pages/Home";
+import {UserHistory} from "./pages/UserHistory";
 
 
 const root = createRoot(document.getElementsByTagName('main')[0]);
@@ -15,6 +16,7 @@ root.render(
             <Route path="*" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/home" element={<Home />} />
+            <Route path="/userHistory" element={<UserHistory />} />
         </Routes>
     </BrowserRouter>,
 );

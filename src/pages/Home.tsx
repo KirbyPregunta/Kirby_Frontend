@@ -3,6 +3,7 @@ import {HeaderLogin} from "../components/HeaderLogin";
 import {useFetchUser} from "../functions/useFetchUser";
 import {useEffect, useState} from "react";
 import {Game, User} from "../types/types";
+import {Dropdown} from "../components/Dropdown";
 
 
 export const Home = () => {
@@ -74,8 +75,7 @@ export const Home = () => {
                                         <img className="w-[18px] lg:w-[28px] max-w-[100%]" src="/crown.png" alt={'Score'}/>
                                         <label className="text-[12px] lg:text-[20px] text-white">{game ? game.score : "-"}</label>
                                     </div>
-                                    <div className="flex gap-x-2">
-
+                                    <div className="flex gap-x-2 items-center">
                                         {game &&
                                             <a href="/partida/jugar"
                                                className="text-white text-[10px] lg:text-[15px] lg:tracking-[0.16em] font-semibold">
@@ -88,26 +88,7 @@ export const Home = () => {
 
                                         <div className="flex justify-center items-center gap-x-2">
                                             <div>
-                                                <button id="foto-perfil" type="button"
-                                                        data-dropdown-toggle="userDrodown"
-                                                        data-dropdown-placement="bottom-start"
-                                                        className="text-[#9D9D9D] text-[15px] font-semibold tracking-[0.10em]">VER
-                                                    HISTORIAL
-                                                </button>
-
-                                                <div id="userDrodown"
-                                                     className="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
-                                                    <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="avatarButton">
-                                                        <li>
-                                                            <a  href="/historial/partidasJugadas"
-                                                                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Historial de partidas</a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="/historial/duelosJugados"
-                                                               className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Historial de duelos</a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
+                                                <Dropdown />
                                             </div>
                                         </div>
                                     </div>

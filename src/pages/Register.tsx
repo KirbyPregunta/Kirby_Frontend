@@ -2,16 +2,7 @@ import {Header} from "../components/Header";
 import {Footer} from "../components/Footer";
 import React, {useEffect, useState} from "react";
 import Select from 'react-select';
-
-type Gender = {
-    id: number;
-    description: string;
-}
-
-type Country = {
-    id: number;
-    description: string;
-}
+import {Country, Gender} from "../types/types";
 
 type User = {
     name: string;
