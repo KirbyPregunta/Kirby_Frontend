@@ -1,5 +1,5 @@
-import {Header} from "../components/Header";
-import {Footer} from "../components/Footer";
+import {Header} from "../components/General/Header";
+import {Footer} from "../components/General/Footer";
 import React, {useState} from "react";
 
 export const Login = ()=>  {

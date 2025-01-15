@@ -1,5 +1,5 @@
-import {Header} from "../components/Header";
-import {Footer} from "../components/Footer";
+import {Header} from "../components/General/Header";
+import {Footer} from "../components/General/Footer";
 import React, {useEffect, useState} from "react";
 import Select from 'react-select';
 import {Country, Gender} from "../types/types";
