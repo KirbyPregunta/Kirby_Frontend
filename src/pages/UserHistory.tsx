@@ -17,8 +17,7 @@ export const UserHistory = () => {
             console.error("Fetch user failed:", error);
         }
     }
-    
-    
+
     useEffect(() => {
         fetchGames().then(r => {
             const games = r as Game[];
